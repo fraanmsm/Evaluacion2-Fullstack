@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: api_camas
+  datasource:
+    url: jdbc:oracle:thin:@(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-santiago-1.oraclecloud.com))(connect_data=(service_name=g78ae214bc9aa87_bbddfullsatck_medium.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+    username: ADMIN
+    password: Ladooscuro197902@
+    driver-class-name: oracle.jdbc.OracleDriver
+    jpa:
+      database-platform: org.hibernate.dialect.OracleDialect
+      hibernate:
+        ddl-auto: validate
+      show-sql: true
+server:
+  port: 25000
