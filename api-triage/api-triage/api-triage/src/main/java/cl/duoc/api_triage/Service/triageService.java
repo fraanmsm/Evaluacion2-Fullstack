@@ -1,7 +1,9 @@
 package cl.duoc.api_triage.Service;
 
 import cl.duoc.api_triage.Model.triage;
+import cl.duoc.api_triage.Model.bitacora;
 import cl.duoc.api_triage.Repository.triageRepository;
+import cl.duoc.api_triage.Repository.bitacoraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,9 @@ public class triageService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private bitacoraRepository bitacoraRepo; // Inyección de la bitácora
 
     private final String CAMAS_API_URL = "http://localhost:25000/api/camas/disponibilidad/";
 
@@ -64,7 +69,12 @@ public class triageService {
             nuevo.setEstadoEspera("LISTA DE ESPERA CRÍTICA");
         }
 
-        return repository.save(nuevo);
+        triage guardado = repository.save(nuevo);
+
+        // Registro en auditoría
+        registrarEnBitacora(guardado.getId(), "INGRESO TRIAGE - Gravedad: " + guardado.getGravedad() + " - Estado: " + guardado.getEstadoEspera());
+
+        return guardado;
     }
 
     public triage actualizar(Long id, triage datosNuevos) {
@@ -80,7 +90,12 @@ public class triageService {
         existente.setApellidoMaterno(datosNuevos.getApellidoMaterno());
         existente.setGravedad(datosNuevos.getGravedad());
 
-        return repository.save(existente);
+        triage actualizado = repository.save(existente);
+
+        // Registro en auditoría
+        registrarEnBitacora(actualizado.getId(), "ACTUALIZACION DE DATOS - Nueva Gravedad: " + actualizado.getGravedad());
+
+        return actualizado;
     }
 
     @Transactional
@@ -94,5 +109,17 @@ public class triageService {
 
         paciente.setActivo(false);
         repository.save(paciente);
+
+        // Registro en auditoría
+        registrarEnBitacora(paciente.getId(), "EGRESO/ALTA MEDICA");
+    }
+
+    // Método privado centralizado para guardar el log
+    private void registrarEnBitacora(Long idPaciente, String accion) {
+        bitacora log = new bitacora();
+        log.setIdPaciente(idPaciente);
+        log.setAccion(accion);
+        log.setFechaHora(java.time.LocalDateTime.now());
+        bitacoraRepo.save(log);
     }
 }
