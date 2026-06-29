@@ -1,0 +1,16 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api-triage-route
+          uri: ${URI_API_TRIAGE}
+          predicates:
+            - Path=/api/v1/triage/**
+            
+        - id: api-camas-route
+          uri: ${URI_API_CAMAS}
+          predicates:
+            - Path=/api/camas/**

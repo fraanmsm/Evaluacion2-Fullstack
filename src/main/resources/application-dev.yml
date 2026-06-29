@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api-triage-route
+          uri: http://localhost:16800
+          predicates:
+            - Path=/api/v1/triage/**
+            
+        - id: api-camas-route
+          uri: http://localhost:25000
+          predicates:
+            - Path=/api/camas/**
