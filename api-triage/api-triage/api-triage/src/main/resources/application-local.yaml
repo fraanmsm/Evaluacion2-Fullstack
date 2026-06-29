@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: api-triage
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/FREE
+    username: system
+    password: PasswordDoce123
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 16800
