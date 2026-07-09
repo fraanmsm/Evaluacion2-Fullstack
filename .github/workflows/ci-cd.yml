@@ -1,13 +1,10 @@
 name: Java CI con Maven
-
 on:
   push:
     branches: [ main ]
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     steps:
     - name: Clonar el repositorio
       uses: actions/checkout@v4
@@ -20,11 +17,11 @@ jobs:
 
     - name: Evaluar API Camas
       run: |
-        cd api-camas/api-camas
+        cd api-camas/api-camas/api-camas
         mvn clean test
       continue-on-error: true
 
     - name: Evaluar API Triage
       run: |
-        cd api-triage/api-triage
+        cd api-triage/api-triage/api-triage
         mvn clean test
