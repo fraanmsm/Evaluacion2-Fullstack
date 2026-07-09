@@ -19,8 +19,12 @@ jobs:
         distribution: 'temurin'
 
     - name: Evaluar API Camas
-      run: mwb -f api-camas/pom.xml clean test
+      run: |
+        cd api-camas/api-camas
+        mvn clean test
       continue-on-error: true
 
     - name: Evaluar API Triage
-      run: mvn -f api-triage/pom.xml clean test
+      run: |
+        cd api-triage/api-triage
+        mvn clean test
