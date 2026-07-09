@@ -7,7 +7,7 @@ import cl.duoc.api_triage.Repository.bitacoraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,13 +17,11 @@ public class triageService {
     @Autowired
     private triageRepository repository;
 
-    @Autowired
-    private RestTemplate restTemplate;
+   @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private bitacoraRepository bitacoraRepo; // Inyección de la bitácora
-
-    private final String CAMAS_API_URL = "http://localhost:25000/api/camas/disponibilidad/";
 
     public List<triage> listarTodosActivos() {
         return repository.findAll().stream()
@@ -55,17 +53,13 @@ public class triageService {
                     nuevo.getApellidoPaterno() + " " + nuevo.getApellidoMaterno());
         }
 
-        try {
-            String urlDestino = CAMAS_API_URL + nuevo.getGravedad();
-            Boolean hayCamaDisponible = restTemplate.getForObject(urlDestino, Boolean.class);
+         try {
+            rabbitTemplate.convertAndSend("cola-camas", nuevo);
 
-            if (hayCamaDisponible != null && hayCamaDisponible) {
-                nuevo.setEstadoEspera("EN ESPERA");
-            } else {
-                nuevo.setEstadoEspera("LISTA DE ESPERA CRÍTICA");
-            }
+            nuevo.setEstadoEspera("EN ESPERA");
+
         } catch (Exception e) {
-            System.out.println("api-camas fuera de línea. Activando protocolo de contingencia.");
+            System.out.println("Error al enviar el mensaje a RabbitMQ.");
             nuevo.setEstadoEspera("LISTA DE ESPERA CRÍTICA");
         }
 
