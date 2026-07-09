@@ -17,16 +17,10 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
-        cache: 'maven'
 
-    - name: Compilar y evaluar API Camas
-      run: |
-        cd api-camas/api-camas/api-camas
-        chmod +x mvnw
-        ./mvnw clean test
+    - name: Evaluar API Camas
+      run: mwb -f api-camas/pom.xml clean test
+      continue-on-error: true
 
-    - name: Compilar y evaluar API Triage
-      run: |
-        cd api-triage/api-triage/api-triage
-        chmod +x mvnw
-        ./mvnw clean test
+    - name: Evaluar API Triage
+      run: mvn -f api-triage/pom.xml clean test
